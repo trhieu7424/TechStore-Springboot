@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thanh toán đơn hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+    
+    <div class="container py-5">
+        <h2 class="mb-4 text-center">💳 Thanh Toán An Toàn</h2>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">📦 Xác nhận sản phẩm</h5>
+                    </div>
+                    <div class="card-body d-flex gap-3 align-items-center">
+                        <img th:src="${product.imageUrl}" class="rounded border" style="width: 100px; height: 100px; object-fit: cover;">
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1" th:text="${product.name}">Tên sản phẩm</h5>
+                            <span class="badge bg-secondary" th:text="${product.category != null ? product.category.name : 'Sản phẩm'}"></span>
+                            <div class="text-muted mt-2">Số lượng: <b>1</b></div>
+                        </div>
+                        <h4 class="text-danger fw-bold" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></h4>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+                        <span class="fs-5">Tổng thanh toán:</span>
+                        <strong class="fs-4 text-danger" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                    </div>
+                </div>
+                <a href="/" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Quay lại mua sắm</a>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">💰 Phương thức thanh toán</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="paymentForm">
+                            <div class="form-check border rounded p-3 mb-2 bg-white">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked onchange="toggleQR(false)">
+                                <label class="form-check-label d-flex align-items-center gap-2 w-100" for="cod" style="cursor: pointer;">
+                                    <i class="fas fa-truck text-primary fs-4"></i>
+                                    <div>
+                                        <strong>Thanh toán khi nhận hàng (COD)</strong>
+                                        <div class="text-muted small">Kiểm tra hàng rồi mới trả tiền.</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="form-check border rounded p-3 mb-3 bg-white">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="banking" value="BANKING" onchange="toggleQR(true)">
+                                <label class="form-check-label d-flex align-items-center gap-2 w-100" for="banking" style="cursor: pointer;">
+                                    <i class="fas fa-qrcode text-danger fs-4"></i>
+                                    <div>
+                                        <strong>Chuyển khoản Ngân hàng</strong>
+                                        <div class="text-muted small">Quét mã QR - Xác nhận tức thì.</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div id="qrArea" class="text-center mb-3 p-3 bg-white border rounded d-none">
+                                <p class="mb-2 fw-bold text-success">Mở App Ngân hàng để quét:</p>
+                                <img src="https://img.vietqr.io/image/MB-0000000000-compact2.png" 
+                                     alt="QR Code" class="img-fluid border shadow-sm" style="width: 200px;">
+                                <p class="small text-muted mt-2">Nội dung CK: <b>TECHSTORE MUA HANG</b></p>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow-sm">
+                                ✅ ĐẶT HÀNG NGAY
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const productId = [[${product.id}]];
+
+        function toggleQR(show) {
+            const qr = document.getElementById('qrArea');
+            if(show) qr.classList.remove('d-none');
+            else qr.classList.add('d-none');
+        }
+
+        document.getElementById("paymentForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+            if(!confirm("Xác nhận đặt đơn hàng này?")) return;
+
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productIds: [productId], 
+                        paymentMethod: method
+                    })
+                });
+
+                if (response.ok) {
+                    alert("🎉 Chúc mừng! Đặt hàng thành công.");
+                    window.location.href = "/history";
+                } else {
+                    alert("❌ Lỗi đặt hàng! Vui lòng thử lại.");
+                }
+            } catch (err) {
+                alert("Lỗi kết nối: " + err.message);
+            }
+        });
+    </script>
+</body>
+</html>

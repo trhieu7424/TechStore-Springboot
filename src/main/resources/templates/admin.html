@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard - TechStore</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card { transition: all 0.3s; border-left: 5px solid; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+        .nav-tabs .nav-link.active { background-color: #0d6efd; color: white !important; border-color: #0d6efd; }
+        .nav-tabs .nav-link { color: #495057; }
+    </style>
+</head>
+<body class="bg-light">
+    
+    <nav class="navbar navbar-dark bg-dark mb-4 shadow">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold" href="#">🚀 TECHSTORE ADMIN</a>
+            <div>
+                <a href="/" class="btn btn-outline-light btn-sm me-2"><i class="fas fa-store"></i> Xem Shop</a>
+                <a href="/logout" class="btn btn-danger btn-sm">Đăng xuất</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4">
+        
+        <ul class="nav nav-tabs mb-4 border-bottom-0" id="adminTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active fw-bold px-4" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard-pane">
+                    📊 Tổng quan
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold px-4" id="product-tab" data-bs-toggle="tab" data-bs-target="#product-pane">
+                    📦 Sản phẩm
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold px-4" id="category-tab" data-bs-toggle="tab" data-bs-target="#category-pane">
+                    📂 Danh mục
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold px-4" id="order-tab" data-bs-toggle="tab" data-bs-target="#order-pane">
+                    🚚 Đơn hàng
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold px-4" id="user-tab" data-bs-toggle="tab" data-bs-target="#user-pane">
+                    👥 Người dùng
+                </button>
+            </li>
+        </ul>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="tab-content">
+                    
+                    <div class="tab-pane fade show active" id="dashboard-pane">
+                        <h4 class="mb-4 text-secondary">Thống kê hoạt động kinh doanh</h4>
+                        
+                        <div class="row g-4 mb-4">
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card stat-card shadow-sm h-100 border-primary">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="text-primary fw-bold text-uppercase mb-1 small">Doanh Thu</div>
+                                                <div class="h4 mb-0 fw-bold" th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' đ'"></div>
+                                            </div>
+                                            <div class="text-primary opacity-25"><i class="fas fa-dollar-sign fa-3x"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card stat-card shadow-sm h-100 border-success">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="text-success fw-bold text-uppercase mb-1 small">Đơn Hàng</div>
+                                                <div class="h4 mb-0 fw-bold" th:text="${orders.size()}"></div>
+                                            </div>
+                                            <div class="text-success opacity-25"><i class="fas fa-shopping-cart fa-3x"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card stat-card shadow-sm h-100 border-warning">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="text-warning fw-bold text-uppercase mb-1 small">Sản Phẩm</div>
+                                                <div class="h4 mb-0 fw-bold" th:text="${products.size()}"></div>
+                                            </div>
+                                            <div class="text-warning opacity-25"><i class="fas fa-box-open fa-3x"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card stat-card shadow-sm h-100 border-info">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="text-info fw-bold text-uppercase mb-1 small">Người Dùng</div>
+                                                <div class="h4 mb-0 fw-bold" th:text="${users.size()}"></div>
+                                            </div>
+                                            <div class="text-info opacity-25"><i class="fas fa-users fa-3x"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="m-0 fw-bold text-primary"><i class="fas fa-chart-area me-1"></i> Biểu đồ doanh thu 7 ngày qua</h6>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 400px;">
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="product-pane">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 text-primary">📦 Quản lý Sản phẩm</h5>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">➕ Thêm Mới</button>
+                        </div>
+                        <table class="table table-hover align-middle table-bordered">
+                            <thead class="table-light">
+                                <tr><th>ID</th><th>Ảnh</th><th>Tên</th><th>Giá</th><th>Kho</th><th>Danh mục</th><th>Hành động</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${products}">
+                                    <td th:text="${p.id}"></td>
+                                    <td><img th:src="${p.imageUrl}" style="width: 40px; height: 40px; object-fit: cover;" class="rounded"></td>
+                                    <td th:text="${p.name}"></td>
+                                    <td th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')}"></td>
+                                    <td th:text="${p.quantity}"></td>
+                                    <td th:text="${p.category != null ? p.category.name : '-'}"></td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm" th:onclick="'openEditModal(' + ${p.id} + ')'"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-danger btn-sm" th:onclick="'deleteProduct(' + ${p.id} + ')'"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="tab-pane fade" id="category-pane">
+                         <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 text-warning">📂 Quản lý Danh mục</h5>
+                            <button class="btn btn-warning" onclick="openCategoryModal()">➕ Thêm Danh mục</button>
+                        </div>
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light"><tr><th width="10%">ID</th><th>Tên Danh mục</th><th width="15%">Hành động</th></tr></thead>
+                            <tbody id="categoryTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="tab-pane fade" id="order-pane">
+                        <h5 class="mb-3 text-success">🚚 Quản lý Đơn hàng</h5>
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light"><tr><th>Mã</th><th>User</th><th>Tổng tiền</th><th>Ngày</th><th>Trạng thái</th><th>Xử lý</th></tr></thead>
+                            <tbody>
+                                <tr th:each="order : ${orders}">
+                                    <td th:text="'#' + ${order.id}"></td>
+                                    <td th:text="${order.user.username}"></td>
+                                    <td class="fw-bold text-danger" th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                                    <td th:text="${#temporals.format(order.createdAt, 'dd-MM HH:mm')}"></td>
+                                    <td><span class="badge" th:classappend="${order.status == 'PENDING' ? 'bg-warning' : (order.status == 'COMPLETED' ? 'bg-success' : 'bg-secondary')}" th:text="${order.status}"></span></td>
+                                    <td>
+                                        <select class="form-select form-select-sm" th:onchange="'updateStatus(' + ${order.id} + ', this.value)'">
+                                            <option value="PENDING" th:selected="${order.status == 'PENDING'}">Chờ</option>
+                                            <option value="SHIPPING" th:selected="${order.status == 'SHIPPING'}">Giao</option>
+                                            <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">Xong</option>
+                                            <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Hủy</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="tab-pane fade" id="user-pane">
+                        <h5 class="mb-3 text-info">👥 Quản lý Người dùng</h5>
+                        <table class="table table-bordered">
+                            <thead class="table-light"><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Xóa</th></tr></thead>
+                            <tbody>
+                                <tr th:each="u : ${users}">
+                                    <td th:text="${u.id}"></td>
+                                    <td th:text="${u.username}"></td>
+                                    <td th:text="${u.email}"></td>
+                                    <td><span class="badge bg-info text-dark" th:text="${u.role}"></span></td>
+                                    <td><button class="btn btn-danger btn-sm" th:if="${u.role != 'ADMIN'}" th:onclick="'deleteUser(' + ${u.id} + ')'">Xóa</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addProductModal" tabindex="-1"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title">Thêm Sản Phẩm</h5> <button type="button" class="btn-close" data-bs-dismiss="modal"></button> </div> <div class="modal-body"> <form id="addProductForm"> <div class="mb-2"> <label>Tên SP</label> <input type="text" id="pName" class="form-control" required> </div> <div class="mb-2"> <label>Giá</label> <input type="number" id="pPrice" class="form-control" required> </div> <div class="mb-2"> <label>Số lượng</label> <input type="number" id="pQty" class="form-control" required> </div> <div class="mb-2"> <label>Danh mục</label> <select id="pCatId" class="form-select"></select> </div> <div class="mb-2"> <label>Ảnh</label> <input type="file" id="pImage" class="form-control"> </div> <button type="submit" class="btn btn-primary w-100 mt-3">Lưu</button> </form> </div> </div> </div> </div>
+    <div class="modal fade" id="editProductModal" tabindex="-1"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header bg-warning"> <h5 class="modal-title">Sửa Sản Phẩm</h5> <button type="button" class="btn-close" data-bs-dismiss="modal"></button> </div> <div class="modal-body"> <form id="editProductForm"> <input type="hidden" id="eId"> <div class="mb-2"> <label>Tên SP</label> <input type="text" id="eName" class="form-control"> </div> <div class="mb-2"> <label>Giá</label> <input type="number" id="ePrice" class="form-control"> </div> <div class="mb-2"> <label>Số lượng</label> <input type="number" id="eQty" class="form-control"> </div> <div class="mb-2"> <label>Danh mục</label> <select id="eCatId" class="form-select"></select> </div> <button type="submit" class="btn btn-warning w-100 mt-3">Cập nhật</button> </form> </div> </div> </div> </div>
+    <div class="modal fade" id="categoryModal" tabindex="-1"> <div class="modal-dialog modal-sm"> <div class="modal-content"> <div class="modal-header bg-primary text-white"> <h5 class="modal-title" id="catModalTitle">Danh mục</h5> <button type="button" class="btn-close" data-bs-dismiss="modal"></button> </div> <div class="modal-body"> <input type="hidden" id="catId"> <label>Tên danh mục</label> <input type="text" id="catNameInput" class="form-control mb-3" placeholder="Nhập tên..." required> <button onclick="saveCategory()" class="btn btn-success w-100">Lưu dữ liệu</button> </div> </div> </div> </div>
+
+    <script>
+        // JS VẼ BIỂU ĐỒ (Giữ nguyên)
+        async function loadChart() {
+            try {
+                const res = await fetch('/api/admin/revenue-stats');
+                if(!res.ok) return;
+                const data = await res.json();
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{ label: 'Doanh thu (VND)', data: values, backgroundColor: '#0d6efd', borderRadius: 5, barPercentage: 0.6 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                });
+            } catch(e) { console.error(e); }
+        }
+        loadChart();
+
+        // CÁC HÀM CŨ (Giữ nguyên logic)
+        async function loadCategories() {
+            const res = await fetch('/api/categories');
+            const cats = await res.json();
+            const options = '<option value="">-- Chọn --</option>' + cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            document.getElementById('pCatId').innerHTML = options;
+            document.getElementById('eCatId').innerHTML = options;
+            const tableBody = document.getElementById('categoryTableBody');
+            tableBody.innerHTML = '';
+            cats.forEach(c => {
+                tableBody.innerHTML += `<tr><td>${c.id}</td><td class="fw-bold text-primary">${c.name}</td><td><button class="btn btn-warning btn-sm me-1" onclick="openCategoryModal(${c.id}, '${c.name}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})"><i class="fas fa-trash"></i></button></td></tr>`;
+            });
+        }
+        loadCategories();
+        function openCategoryModal(id = null, name = '') { document.getElementById('catId').value = id || ''; document.getElementById('catNameInput').value = name; document.getElementById('catModalTitle').innerText = id ? "Sửa Danh mục" : "Thêm Danh mục Mới"; new bootstrap.Modal(document.getElementById('categoryModal')).show(); }
+        async function saveCategory() { const id = document.getElementById('catId').value; const name = document.getElementById('catNameInput').value; if (!name) return alert("Vui lòng nhập tên!"); const method = id ? 'PUT' : 'POST'; const url = id ? '/api/categories/' + id : '/api/categories'; const res = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name }) }); if(res.ok) { alert("Thành công!"); location.reload(); } }
+        async function deleteCategory(id) { if(confirm("Xóa danh mục này?")) { await fetch('/api/categories/' + id, { method: 'DELETE' }); loadCategories(); } }
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => { e.preventDefault(); const formData = new FormData(); formData.append("name", document.getElementById("pName").value); formData.append("price", document.getElementById("pPrice").value); formData.append("quantity", document.getElementById("pQty").value); formData.append("categoryId", document.getElementById("pCatId").value); formData.append("image", document.getElementById("pImage").files[0]); await fetch('/api/products', { method: 'POST', body: formData }); alert("Thêm thành công!"); location.reload(); });
+        async function openEditModal(id) { const res = await fetch('/api/products/' + id); const p = await res.json(); document.getElementById('eId').value = p.id; document.getElementById('eName').value = p.name; document.getElementById('ePrice').value = p.price; document.getElementById('eQty').value = p.quantity; if(p.categoryId) document.getElementById('eCatId').value = p.categoryId; new bootstrap.Modal(document.getElementById('editProductModal')).show(); }
+        document.getElementById('editProductForm').addEventListener('submit', async (e) => { e.preventDefault(); const id = document.getElementById('eId').value; const data = { name: document.getElementById('eName').value, price: document.getElementById('ePrice').value, quantity: document.getElementById('eQty').value, categoryId: document.getElementById('eCatId').value }; await fetch('/api/products/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); alert("Cập nhật thành công!"); location.reload(); });
+        async function updateStatus(orderId, newStatus) { if(!confirm("Đổi trạng thái?")) return; await fetch('/api/admin/orders/' + orderId + '/status', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus }) }); location.reload(); }
+        async function deleteUser(id) { if(confirm("Xóa User này?")) { await fetch('/api/admin/users/' + id, { method: 'DELETE' }); location.reload(); } }
+        async function deleteProduct(id) { if(confirm("Xóa sản phẩm này?")) { await fetch('/api/products/' + id, { method: 'DELETE' }); location.reload(); } }
+    </script>
+</body>
+</html>

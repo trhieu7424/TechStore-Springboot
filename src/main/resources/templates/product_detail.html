@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${product.name} + ' - TechStore'">Chi tiết sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">🛍️ TechStore</a>
+            <div class="ms-auto">
+                <a href="/history" class="btn btn-outline-light btn-sm me-2">📜 Đơn hàng</a>
+                <a href="/" class="btn btn-warning btn-sm">🏠 Tiếp tục mua sắm</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="card shadow-sm border-0">
+            <div class="row g-0">
+                <div class="col-md-6 border-end">
+                    <div class="p-4 d-flex align-items-center justify-content-center h-100">
+                        <img th:src="${product.imageUrl}" class="img-fluid rounded" 
+                             style="max-height: 500px; object-fit: contain;" alt="Product Image">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="p-5">
+                        <div class="mb-2">
+                            <span class="badge bg-info text-dark" 
+                                  th:text="${product.category != null ? product.category.name : 'Khác'}">
+                            </span>
+                        </div>
+                        <h2 class="fw-bold mb-3" th:text="${product.name}">Tên sản phẩm</h2>
+                        
+                        <h3 class="text-danger fw-bold mb-4" 
+                            th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                        </h3>
+
+                        <p class="text-muted mb-4" th:text="${product.description}">Mô tả sản phẩm...</p>
+
+                        <div class="d-flex align-items-center mb-4">
+                            <label class="me-3 fw-bold">Số lượng mua:</label>
+                            <input type="number" id="buyQty" class="form-control" value="1" min="1" style="width: 80px;">
+                            <span class="ms-3 text-muted" th:text="'(Kho còn: ' + ${product.quantity} + ')'"></span>
+                        </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button class="btn btn-outline-primary btn-lg w-50" onclick="addToCartDetail()">
+                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                        </button>
+
+                        <a th:href="@{/checkout(productId=${product.id})}" class="btn btn-primary btn-lg w-50">
+                            <i class="fas fa-credit-card"></i> Mua Ngay
+                        </a>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function buyProduct(productId) {
+            const qty = document.getElementById("buyQty").value;
+            
+            if(!confirm("Xác nhận mua " + qty + " sản phẩm này?")) return;
+
+            let productIds = [];
+            for(let i=0; i<qty; i++) productIds.push(productId);
+
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productIds)
+            });
+
+            if (response.ok) {
+                alert("✅ Đặt hàng thành công!");
+                window.location.href = "/history";
+            } else {
+                alert("❌ Lỗi đặt hàng! Vui lòng đăng nhập.");
+            }
+        }
+
+        // Hàm xử lý Thêm vào giỏ cho trang Chi tiết
+    async function addToCartDetail() {
+
+        const productId = [[${product.id}]]; 
+        const qty = document.getElementById("buyQty").value;
+
+        try {
+            const formData = new FormData();
+            formData.append('productId', productId);
+            formData.append('quantity', qty); 
+
+            const res = await fetch('/api/cart/add', {
+                method: 'POST',
+                body: formData
+            });
+
+            if(res.ok) {
+                if(confirm("✅ Đã thêm " + qty + " sản phẩm vào giỏ! Bạn có muốn xem giỏ hàng ngay không?")) {
+                    window.location.href = "/cart";
+                }
+            } else if (res.status === 401) {
+                alert("🔒 Vui lòng đăng nhập để mua hàng!");
+                window.location.href = "/login";
+            } else {
+                alert("❌ Lỗi khi thêm vào giỏ hàng.");
+            }
+        } catch(err) {
+            console.error(err);
+            alert("Lỗi kết nối Server");
+        }
+    }
+    </script>
+</body>
+</html>

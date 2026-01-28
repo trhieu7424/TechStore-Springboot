@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Đăng ký tài khoản</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex justify-content-center align-items-center" style="height: 100vh;">
+    
+    <div class="card shadow p-4" style="width: 400px;">
+        <h3 class="text-center mb-4 text-primary fw-bold">📝 Đăng Ký</h3>
+        
+        <div th:if="${param.error}" class="alert alert-danger text-center">
+            Tên đăng nhập đã tồn tại!
+        </div>
+
+        <form action="/register" method="post">
+            
+            <div class="mb-3">
+                <label class="fw-bold">Tên đăng nhập</label>
+                <input type="text" name="username" class="form-control" placeholder="Nhập tên..." required>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="example@gmail.com" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Mật khẩu</label>
+                <input type="password" name="password" class="form-control" placeholder="******" required>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 py-2 fw-bold">ĐĂNG KÝ NGAY</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="/login" class="text-decoration-none">Đã có tài khoản? Đăng nhập</a>
+        </div>
+    </div>
+
+</body>
+</html>
